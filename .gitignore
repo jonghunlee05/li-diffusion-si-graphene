@@ -1,0 +1,25 @@
+# ---- OS / editor cruft ----
+.DS_Store
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ---- Generated MD outputs (regenerate by running the LJ test) ----
+# These are produced by LAMMPS; they are not source and can be large.
+log.lammps
+log.*.lammps
+*.lammpstrj
+*.dump
+dump.*
+restart.*
+
+# Keep the directory structure but ignore its generated contents.
+trajectories/*
+!trajectories/.gitkeep
+
+# ---- Generated figures (uncomment to ignore; kept by default as validation artifacts) ----
+# figures/*.png

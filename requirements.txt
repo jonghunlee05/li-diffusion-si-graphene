@@ -1,0 +1,11 @@
+# Python dependencies for the analysis toolchain (Phase 1).
+# Install with:  pip install -r requirements.txt
+#
+# Versions are left unpinned for Phase 1 environment validation. Pin exact
+# versions later (Phase 2+) once the production workflow is fixed, for full
+# reproducibility.
+
+ase         # Atomic Simulation Environment: structure handling & I/O (future phases)
+numpy       # Numerical arrays and math
+pandas      # Tabular data handling for log/MSD analysis
+matplotlib  # Plotting (temperature/energy logs, MSD, figures)
