@@ -1,5 +1,7 @@
 # ---- OS / editor cruft ----
 .DS_Store
+# MS Office temporary lock files (e.g. ~$methodology_paper.docx)
+~$*
 
 # ---- Python ----
 __pycache__/
@@ -20,6 +22,10 @@ restart.*
 # Keep the directory structure but ignore its generated contents.
 trajectories/*
 !trajectories/.gitkeep
+
+# ---- Generated structure files (regenerate via structures/build_graphene_li.py) ----
+structures/graphene_li.xyz
+structures/graphene_li.data
 
 # ---- Generated figures (uncomment to ignore; kept by default as validation artifacts) ----
 # figures/*.png

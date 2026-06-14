@@ -30,9 +30,9 @@ Phase 1 is active.
 
 | Phase | Name | Goal | Status |
 |------|------|------|--------|
-| 1 | Environment validation | Confirm LAMMPS, OVITO, and the Python analysis stack all work using a trivial Lennard-Jones test. Produce a trajectory and a validation screenshot. | **Active** |
-| 2 | Force-field selection | Identify and document (with citations) appropriate, *published* interatomic potentials for Si, C, and Li interactions. No parameters are invented. | Planned |
-| 3 | Structure building | Build pristine graphene, silicon, and the Si–graphene interface; introduce controlled graphene defects. | Planned |
+| 1 | Environment validation | Confirm LAMMPS, OVITO, and the Python analysis stack all work using a trivial Lennard-Jones test. Produce a trajectory and a validation screenshot. | **Complete** |
+| 2 | Graphene + Li structure | Build and validate a reproducible pristine graphene + lithium initial structure (no silicon, no defects). Export XYZ + LAMMPS data; sanity-check geometry; visualize in OVITO. | **Active** |
+| 3 | Structure building | Add silicon and the Si–graphene interface; introduce controlled graphene defects. Select published interatomic potentials (no invented parameters). | Planned |
 | 4 | Equilibration | Relax and thermally equilibrate each system. | Planned |
 | 5 | Production MD | Run diffusion simulations with lithium present. | Planned |
 | 6 | Analysis | Compute mean-squared displacement (MSD), diffusion coefficients, and pathway statistics; compare defect vs. pristine. | Planned |
@@ -40,23 +40,43 @@ Phase 1 is active.
 
 ---
 
-## Current Phase 1 objective
+## Phase 1 (complete) — toolchain validation
 
-Demonstrate a working toolchain. Concretely, you should be able to:
+A trivial Lennard-Jones LAMMPS run ([lammps_inputs/in.lj_test](lammps_inputs/in.lj_test))
+that produces a log and a trajectory, plotted with
+[analysis/plot_lammps_log.py](analysis/plot_lammps_log.py) and checked with
+[analysis/check_outputs.py](analysis/check_outputs.py). No real materials, no
+invented parameters. This confirmed LAMMPS, OVITO, and the Python stack all work.
 
-1. Run one simple LAMMPS example ([lammps_inputs/in.lj_test](lammps_inputs/in.lj_test)) — a
-   generic Lennard-Jones fluid with **no real materials and no invented parameters**.
-2. Produce a LAMMPS log file (`log.lammps`) and a dump trajectory file.
-3. Plot temperature and energy from the log with
-   [analysis/plot_lammps_log.py](analysis/plot_lammps_log.py).
-4. Verify expected outputs exist with
-   [analysis/check_outputs.py](analysis/check_outputs.py).
-5. Open the trajectory in OVITO and save a validation screenshot into
-   [figures/](figures/).
+---
 
-Follow the step-by-step guide in
-[notes/phase1_environment_validation.md](notes/phase1_environment_validation.md) and the
-checklist in [docs/sanity_checks.md](docs/sanity_checks.md).
+## Current Phase 2 objective — graphene + Li initial structure
+
+Build and validate a **reproducible pristine graphene + lithium initial
+structure**. No silicon, no defects, no ReaxFF, no MD, no diffusion yet. The
+physical values are literature-informed starting values from the project
+methodology document: graphene lattice constant **2.467 Å**, Li starting height
+**≈ 2.3 Å**, z-vacuum **≈ 20 Å**.
+
+```bash
+# 0. Set up the environment (once)
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+
+# 1. Build the structure -> structures/graphene_li.xyz and .data
+python structures/build_graphene_li.py
+
+# 2. Sanity-check the geometry (atom counts, box, Li–C / C–C distances)
+python analysis/inspect_structure.py
+
+# 3. Open structures/graphene_li.xyz in OVITO and save a screenshot to
+#    figures/phase2_graphene_li_initial_structure.png
+```
+
+Details and validation:
+[docs/phase2_structure_generation.md](docs/phase2_structure_generation.md) ·
+[structures/README.md](structures/README.md) ·
+[notes/phase2_graphene_li_validation.md](notes/phase2_graphene_li_validation.md).
 
 ---
 
@@ -68,7 +88,7 @@ Li_Diffusion_Si_Graphene/
 ├── requirements.txt   # Python analysis dependencies
 ├── literature/        # Reference papers and citation notes (Phase 2+)
 ├── force_fields/      # Published potential files + provenance (Phase 2+)
-├── structures/        # Atomic structures / data files (Phase 3+)
+├── structures/        # Structure builder + generated graphene/Li files (Phase 2)
 ├── lammps_inputs/     # LAMMPS input scripts (Phase 1: LJ test only)
 ├── trajectories/      # MD dump/log outputs
 ├── analysis/          # Python analysis & plotting scripts
