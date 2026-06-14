@@ -1,0 +1,79 @@
+# =====================================================================
+# in.reaxff_smoke_test  --  Phase 3 ReaxFF / QEq SMOKE TEST ONLY
+# =====================================================================
+# Purpose:
+#   Confirm the Li-Si-C ReaxFF setup works in LAMMPS:
+#     - the ReaxFF parameter file loads,
+#     - atom types map to C / Si / Li correctly,
+#     - charge equilibration (fix qeq/reaxff) runs,
+#     - a tiny system is stable for a very short run (no crash, no NaN).
+#
+#   This is NOT production MD. No graphene, no Si slab, no interface, no
+#   diffusion. It runs the 6-atom cluster from
+#   structures/build_reaxff_smoke_test.py.
+#
+# PREREQUISITE (researcher must do this FIRST):
+#   Place the REAL Li-Si-C ReaxFF parameter file in force_fields/ and set
+#   REAXFF_FILE below to its exact name. Do NOT use invented parameters.
+#   See force_fields/README.md.
+#
+# Run with:
+#   lmp -in lammps_inputs/in.reaxff_smoke_test
+#   (binary may be lmp / lmp_serial / lmp_mpi / lammps; needs the REAXFF package)
+# =====================================================================
+
+# ---- 0. Edit this to the real file name ------------------------------
+variable REAXFF_FILE string "force_fields/ffield.reax.LiSiC_OlououGuifo2023.txt"  # real file
+
+# ---- 1. Units / styles -----------------------------------------------
+# ReaxFF requires 'real' units and per-atom charges (atom_style charge).
+units           real
+atom_style      charge
+boundary        p p p
+
+# ---- 2. Read the smoke-test structure --------------------------------
+# Built by structures/build_reaxff_smoke_test.py with type 1=C, 2=Si, 3=Li.
+read_data       structures/reaxff_smoke_test.data
+
+# ---- 3. ReaxFF pair style and mapping --------------------------------
+# pair_style reaxff <control>  ('NULL' = use built-in default control params).
+# This ffield is standard (non-lg) format: 8 columns/atom, 39 general params.
+# (Do NOT add 'lgvdw yes' -- the file has no lg dispersion column.)
+pair_style      reaxff NULL safezone 3.0 mincap 150
+
+# !!! ATOM-ORDER PLACEHOLDER -- VERIFY BEFORE TRUSTING RESULTS !!!
+# The element labels after the file name are matched to LAMMPS atom types
+# 1, 2, 3, ... IN ORDER. Our data file defines  type 1=C, 2=Si, 3=Li, so the
+# order below is  C Si Li.  Each label MUST also exactly match an element name
+# present in the ReaxFF file's header. If the real file names elements
+# differently, fix the labels here (not the data file).
+pair_coeff      * * ${REAXFF_FILE} C Si Li
+
+# ---- 4. Charge equilibration -----------------------------------------
+# QEq assigns per-atom charges every step. Args: Nevery cutlo cuthi tol param.
+fix             qeq all qeq/reaxff 1 0.0 10.0 1.0e-6 reaxff
+
+# ---- 5. Output: log + thermo + dump ----------------------------------
+log             logs/reaxff_smoke_test.log
+thermo          10
+# Track temperature and energies so the log checker can confirm finite,
+# non-exploding behavior. (QEq charges are validated via the dump + log scan.)
+thermo_style    custom step temp pe etotal press
+dump            traj all atom 10 trajectories/reaxff_smoke_test.lammpstrj
+
+# ---- 6. Energy minimization ------------------------------------------
+# Relax the cluster gently first. Conservative tolerances / few steps.
+min_style       cg
+minimize        1.0e-4 1.0e-6 100 1000
+
+# ---- 7. Very short, low-temperature stability test -------------------
+# Only a brief, cold NVT nudge to confirm dynamics + QEq stay stable.
+# Timestep 0.25 fs is conservative (methodology lists 0.25/0.5/1.0 fs as the
+# values to test; Olou'ou Guifo et al. [4] used 0.5 and 0.1 fs).
+velocity        all create 50.0 12345 mom yes rot yes dist gaussian
+fix             nvt all nvt temp 50.0 50.0 25.0
+timestep        0.25
+run             100
+
+print "ReaxFF smoke test finished. Check logs/reaxff_smoke_test.log and "
+print "trajectories/reaxff_smoke_test.lammpstrj (atoms should NOT have exploded)."

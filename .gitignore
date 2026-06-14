@@ -27,5 +27,12 @@ trajectories/*
 structures/graphene_li.xyz
 structures/graphene_li.data
 
+# ---- Phase 3 ReaxFF smoke-test outputs: KEPT as validation evidence ----
+# These depend on the researcher-supplied ReaxFF file (not regenerable by
+# others), so they are committed rather than ignored. Re-include them even
+# though the generic *.lammpstrj / trajectories/* rules above would hide them.
+!logs/reaxff_smoke_test.log
+!trajectories/reaxff_smoke_test.lammpstrj
+
 # ---- Generated figures (uncomment to ignore; kept by default as validation artifacts) ----
 # figures/*.png

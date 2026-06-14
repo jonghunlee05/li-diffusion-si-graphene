@@ -1,0 +1,149 @@
+thermo          10
+# Track temperature and energies so the log checker can confirm finite,
+# non-exploding behavior. (QEq charges are validated via the dump + log scan.)
+thermo_style    custom step temp pe etotal press
+dump            traj all atom 10 trajectories/reaxff_smoke_test.lammpstrj
+
+# ---- 6. Energy minimization ------------------------------------------
+# Relax the cluster gently first. Conservative tolerances / few steps.
+min_style       cg
+minimize        1.0e-4 1.0e-6 100 1000
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Your simulation uses code contributions which should be cited:
+
+- pair reaxff command: doi:10.1016/j.parco.2011.08.005
+
+@Article{Aktulga12,
+ author = {H. M. Aktulga and J. C. Fogarty and S. A. Pandit and A. Y. Grama},
+ title = {Parallel Reactive Molecular Dynamics: {N}umerical Methods and Algorithmic Techniques},
+ journal = {Parallel Computing},
+ year =    2012,
+ volume =  38,
+ number =  {4--5},
+ pages =   {245--259}
+}
+
+- fix qeq/reaxff command: doi:10.1016/j.parco.2011.08.005
+
+@Article{Aktulga12,
+ author = {H. M. Aktulga and J. C. Fogarty and S. A. Pandit and A. Y. Grama},
+ title = {Parallel Reactive Molecular Dynamics: {N}umerical Methods and Algorithmic Techniques},
+ journal = {Parallel Computing},
+ year =    2012,
+ volume =  38,
+ pages =   {245--259}
+}
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 12
+  ghost atom cutoff = 12
+  binsize = 6, bins = 4 4 4
+  2 neighbor lists, perpetual/occasional/extra = 2 0 0
+  (1) pair reaxff, perpetual
+      attributes: half, newton off, ghost
+      pair build: half/bin/ghost/newtoff
+      stencil: full/ghost/bin/3d
+      bin: standard
+  (2) fix qeq/reaxff, perpetual, copy from (1)
+      attributes: half, newton off
+      pair build: copy
+      stencil: none
+      bin: none
+Per MPI rank memory allocation (min/avg/max) = 12.26 | 12.26 | 12.26 Mbytes
+   Step          Temp          PotEng         TotEng         Press     
+         0   0             -186.62626     -186.62626     -1266.1721    
+        10   0             -358.02456     -358.02456      615.32831    
+Loop time of 0.00375983 on 1 procs for 10 steps with 6 atoms
+
+99.9% CPU use with 1 MPI tasks x no OpenMP threads
+
+Minimization stats:
+  Stopping criterion = linesearch alpha is zero
+  Energy initial, next-to-last, final = 
+     -186.626262210548  -358.024564490939  -358.024564445968
+  Force two-norm initial, final = 155.67017 98.888999
+  Force max component initial, final = 75.466992 48.066686
+  Final line search alpha, max atom move = 4.1472708e-11 1.9934556e-09
+  Iterations, force evaluations = 10 61
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.0035063  | 0.0035063  | 0.0035063  |   0.0 | 93.26
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 2.4954e-05 | 2.4954e-05 | 2.4954e-05 |   0.0 |  0.66
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0.00020325 | 0.00020325 | 0.00020325 |   0.0 |  5.41
+Other   |            | 2.538e-05  |            |       |  0.67
+
+Nlocal:              6 ave           6 max           6 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            138 ave         138 max         138 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:             15 ave          15 max          15 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 15
+Ave neighs/atom = 2.5
+Neighbor list builds = 0
+Dangerous builds = 0
+
+# ---- 7. Very short, low-temperature stability test -------------------
+# Only a brief, cold NVT nudge to confirm dynamics + QEq stay stable.
+# Timestep 0.25 fs is conservative (methodology lists 0.25/0.5/1.0 fs as the
+# values to test; Olou'ou Guifo et al. [4] used 0.5 and 0.1 fs).
+velocity        all create 50.0 12345 mom yes rot yes dist gaussian
+fix             nvt all nvt temp 50.0 50.0 25.0
+timestep        0.25
+run             100
+Per MPI rank memory allocation (min/avg/max) = 12.14 | 12.14 | 12.14 Mbytes
+   Step          Temp          PotEng         TotEng         Press     
+        10   50            -358.02456     -357.27936      619.58641    
+        20   57.740226     -358.15856     -357.298        614.91478    
+        30   133.34522     -359.61198     -357.6246       209.7939     
+        40   135.13588     -360.02561     -358.01154     -254.14505    
+        50   179.19341     -360.85658     -358.18588     -289.18052    
+        60   266.816       -362.31127     -358.33463      110.26593    
+        70   254.34039     -362.6016      -358.8109       470.39877    
+        80   246.02527     -363.28001     -359.61324      495.27258    
+        90   271.4449      -364.72555     -360.67992      210.90849    
+       100   247.83783     -365.42106     -361.72727     -163.88496    
+       110   223.70601     -365.7578      -362.42368     -304.57436    
+Loop time of 0.00604263 on 1 procs for 100 steps with 6 atoms
+
+Performance: 357.461 ns/day, 0.067 hours/ns, 16549.099 timesteps/s, 99.295 katom-step/s
+99.1% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.005588   | 0.005588   | 0.005588   |   0.0 | 92.48
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 3.9952e-05 | 3.9952e-05 | 3.9952e-05 |   0.0 |  0.66
+Output  | 0.00011367 | 0.00011367 | 0.00011367 |   0.0 |  1.88
+Modify  | 0.0002857  | 0.0002857  | 0.0002857  |   0.0 |  4.73
+Other   |            | 1.534e-05  |            |       |  0.25
+
+Nlocal:              6 ave           6 max           6 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            138 ave         138 max         138 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:             15 ave          15 max          15 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 15
+Ave neighs/atom = 2.5
+Neighbor list builds = 0
+Dangerous builds = 0
+
+print "ReaxFF smoke test finished. Check logs/reaxff_smoke_test.log and "
+ReaxFF smoke test finished. Check logs/reaxff_smoke_test.log and 
+print "trajectories/reaxff_smoke_test.lammpstrj (atoms should NOT have exploded)."
+trajectories/reaxff_smoke_test.lammpstrj (atoms should NOT have exploded).
+Total wall time: 0:00:00
