@@ -8,11 +8,12 @@ volume changes and improves electrical conductivity. The behavior of lithium at 
 Si–graphene interface — especially around graphene defects — is central to rate
 performance and cycle life.
 
-> **Status: Phases 1–3 complete; Phase 4 next.**
-> The LAMMPS/OVITO/Python toolchain is validated (Phase 1), a pristine graphene + Li
-> initial structure is built (Phase 2), and the published Li–Si–C ReaxFF loads and
-> passes a stable QEq smoke test (Phase 3). **No production MD has been run and no
-> diffusion results exist yet.** Next: Phase 4 — Model A (pristine Si–graphene–Li).
+> **Status: Phases 1–4 complete; Phase 5 next.**
+> Toolchain validated (Phase 1), pristine graphene + Li structure built (Phase 2),
+> Li–Si–C ReaxFF QEq smoke test passed (Phase 3), and **Model A (pristine
+> Si–graphene–Li) minimizes and equilibrates without collapse** (Phase 4). **No
+> production MD has been run and no diffusion results exist yet.** Next: Phase 5 —
+> Model B (vacancy-defective graphene).
 
 ---
 
@@ -23,7 +24,7 @@ the lithium diffusion coefficient and diffusion pathways near a silicon–graphe
 interface, and compare against pristine graphene as a baseline.
 
 This is the project's end goal. The phases below track progress toward it; Phases
-1–3 are complete and Phase 4 (Model A) is next.
+1–4 are complete and Phase 5 (Model B, vacancy-defective graphene) is next.
 
 ---
 
@@ -34,8 +35,8 @@ This is the project's end goal. The phases below track progress toward it; Phase
 | 1 | Environment validation | Confirm LAMMPS, OVITO, and the Python analysis stack all work using a trivial Lennard-Jones test. Produce a trajectory and a validation screenshot. | **Complete** |
 | 2 | Graphene + Li structure | Build and validate a reproducible pristine graphene + lithium initial structure (no silicon, no defects). Export XYZ + LAMMPS data; sanity-check geometry; visualize in OVITO. | **Complete** |
 | 3 | Force-field / ReaxFF validation | Confirm the published Li–Si–C ReaxFF loads in LAMMPS, atom types map correctly, QEq runs, and a tiny test is stable. No invented parameters. | **Complete** |
-| 4 | Model A: pristine Si–graphene–Li | Build, minimize, and equilibrate the pristine Si–graphene interface with Li. | Planned |
-| 5 | Model B: defective Si–graphene–Li | Same as Model A plus a graphene vacancy defect; identical protocol. | Planned |
+| 4 | Model A: pristine Si–graphene–Li | Build, minimize, and equilibrate the pristine Si–graphene interface with Li. | **Complete** |
+| 5 | Model B: defective Si–graphene–Li | Same as Model A plus a graphene vacancy defect; identical protocol. | **Active** |
 | 6 | Production MD | Run diffusion simulations for Models A and B. | Planned |
 | 7 | MSD & diffusion analysis | Compute MSD, diffusion coefficients, and pathway statistics; compare defect vs. pristine. | Planned |
 
@@ -100,6 +101,36 @@ Details and validation:
 [docs/phase3_force_field_validation.md](docs/phase3_force_field_validation.md) ·
 [force_fields/README.md](force_fields/README.md) ·
 [notes/phase3_reaxff_validation.md](notes/phase3_reaxff_validation.md).
+
+---
+
+## Phase 4 (complete) — Model A: pristine Si–graphene–Li
+
+Built the first real interface model — a **Si(111) slab + pristine graphene + Li**
+(48 Si + 18 C + 9 Li) — and confirmed it **minimizes and equilibrates without
+collapse** using the validated Li–Si–C ReaxFF. Si is strained −3.64% to match
+graphene (methodology's ~4% mismatch); Si–graphene gap 2.0 Å (Chou [1]); 18 Å
+vacuum (Qin [2]). Bottom Si is fixed (the ReaxFF has no H, so Qin's H-passivation
+isn't possible — documented deviation). **Structural validation only** — no
+defects, no production MD, no diffusion.
+
+```bash
+# 1. Build + sanity-check the structure
+python structures/build_model_a_pristine.py
+python analysis/inspect_model_a.py
+
+# 2. Minimize, then short NVT equilibration (ReaxFF + QEq)
+lmp_serial -in lammps_inputs/in.model_a_minimize
+lmp_serial -in lammps_inputs/in.model_a_equilibrate_short
+
+# 3. Check logs; open trajectory in OVITO; save
+#    figures/phase4_model_a_pristine_equilibrated.png
+python analysis/check_model_a_logs.py
+```
+
+Details and validation:
+[docs/phase4_model_a_construction.md](docs/phase4_model_a_construction.md) ·
+[notes/phase4_model_a_validation.md](notes/phase4_model_a_validation.md).
 
 ---
 

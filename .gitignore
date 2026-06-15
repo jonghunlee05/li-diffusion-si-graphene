@@ -34,5 +34,9 @@ structures/graphene_li.data
 !logs/reaxff_smoke_test.log
 !trajectories/reaxff_smoke_test.lammpstrj
 
+# ---- Phase 4 Model A outputs: KEPT as validation evidence ----
+!trajectories/model_a_minimize.lammpstrj
+!trajectories/model_a_equilibrate_short.lammpstrj
+
 # ---- Generated figures (uncomment to ignore; kept by default as validation artifacts) ----
 # figures/*.png

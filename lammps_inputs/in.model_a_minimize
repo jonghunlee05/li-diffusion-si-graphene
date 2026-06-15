@@ -1,0 +1,51 @@
+# =====================================================================
+# in.model_a_minimize  --  Phase 4: Model A energy minimization
+# =====================================================================
+# Minimize the pristine Si-graphene-Li interface (structures/model_a_pristine.data)
+# with the Li-Si-C ReaxFF + QEq. Structural validation only -- NOT production MD,
+# NOT diffusion.
+#
+# Bottom Si layer is FIXED (fix setforce 0) to mimic bulk. NOTE: Qin et al. [2]
+# passivate bottom dangling bonds with H, but the Olou'ou Guifo et al. [4]
+# Li-Si-C ReaxFF has NO hydrogen, so we fix the bottom Si instead (documented
+# deviation -- see docs/phase4_model_a_construction.md).
+#
+# Run: lmp_serial -in lammps_inputs/in.model_a_minimize
+# =====================================================================
+
+variable REAXFF_FILE string "force_fields/ffield.reax.LiSiC_OlououGuifo2023.txt"
+
+units           real
+atom_style      charge
+boundary        p p p
+
+read_data       structures/model_a_pristine.data
+
+# ReaxFF (standard, non-lg) + atom-type mapping consistent with Phase 3:
+# data file types 1=C, 2=Si, 3=Li.
+pair_style      reaxff NULL safezone 3.0 mincap 150
+pair_coeff      * * ${REAXFF_FILE} C Si Li
+
+# Charge equilibration every step.
+fix             qeq all qeq/reaxff 1 0.0 10.0 1.0e-6 reaxff
+
+# Fix the bottom Si layer (z up to 3.5 A in the as-built data file; bottom Si
+# plane sits at z = 0). Mimics a bulk-anchored substrate; no H passivation.
+region          bottom block INF INF INF INF INF 3.5 units box
+group           bottom region bottom
+fix             freeze bottom setforce 0.0 0.0 0.0
+
+# Output.
+log             logs/model_a_minimize.log
+thermo          25
+thermo_style    custom step temp pe etotal press
+dump            traj all atom 25 trajectories/model_a_minimize.lammpstrj
+
+# Conjugate-gradient minimization (conservative tolerances / step caps).
+min_style       cg
+minimize        1.0e-4 1.0e-6 2000 20000
+
+# Save the minimized structure for the equilibration step.
+write_data      structures/model_a_pristine_minimized.data nocoeff
+
+print "Model A minimization done -> structures/model_a_pristine_minimized.data"
