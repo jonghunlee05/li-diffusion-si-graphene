@@ -177,6 +177,53 @@ def min_dist(atoms, idx_a, idx_b):
     return best if np.isfinite(best) else None
 
 
+# Shared default build parameters (so Model B can reuse EXACTLY Model A's build).
+DEFAULTS = dict(gx=3, gy=3, si_nx=2, si_ny=2, si_layers=6, n_li=9)
+
+
+def assemble_model_a(gx=3, gy=3, si_nx=2, si_ny=2, si_layers=6, n_li=9):
+    """
+    Assemble the Model A structure (pristine Si-graphene-Li) and return
+    (model, info_dict). This is the SINGLE SOURCE OF TRUTH for the Model A/B
+    geometry: Model B (Phase 5) imports this and removes one C, guaranteeing the
+    two models differ ONLY by the vacancy. Atom order: C (graphene), then Si
+    (slab), then Li.
+    """
+    # 1. Pristine graphene (defines the common in-plane cell).
+    g = build_graphene_hex(gx, gy)
+    n_c = len(g)
+
+    # 2. Si(111) slab, then strain its in-plane cell to the graphene cell.
+    slab = build_si111_slab(si_layers, si_nx, si_ny)
+    slab, strain_pct = strain_inplane_to(slab, g.cell)
+    n_si = len(slab)
+
+    # 3. Stack along z: Si slab at the bottom, graphene GAP above the top Si,
+    #    Li LI_HEIGHT above graphene.
+    slab.translate((0, 0, -slab.get_positions()[:, 2].min()))   # bottom Si at z=0
+    si_top = slab.get_positions()[:, 2].max()
+
+    gpos = g.get_positions()
+    gpos[:, 2] -= gpos[:, 2].mean()           # zero graphene's own z-offset
+    z_graphene = si_top + GAP_SI_GR
+    gpos[:, 2] += z_graphene
+    g.set_positions(gpos)
+
+    z_li = z_graphene + LI_HEIGHT
+    li = place_lithium(g.cell, z_li, n_li)
+
+    # 4. Combine (carbons, then Si, then Li) in graphene's in-plane cell.
+    model = g + slab + li
+    cell = g.cell.copy()
+    cell[2] = (0.0, 0.0, z_li + VACUUM)
+    model.set_cell(cell)
+    model.set_pbc([True, True, True])
+
+    info = dict(n_c=n_c, n_si=n_si, n_li=len(li), strain_pct=strain_pct,
+                z_graphene=z_graphene, gap=GAP_SI_GR, si_top=si_top)
+    return model, info
+
+
 def main():
     ap = argparse.ArgumentParser(description="Build Model A: pristine Si-graphene-Li.")
     ap.add_argument("--gx", type=int, default=3, help="graphene cells along a1 (default 3)")
@@ -193,39 +240,11 @@ def main():
     xyz_path = os.path.join(out_dir, "model_a_pristine.xyz")
     data_path = os.path.join(out_dir, "model_a_pristine.data")
 
-    # 1. Pristine graphene (defines the common in-plane cell).
-    g = build_graphene_hex(args.gx, args.gy)
-    n_c = len(g)
-
-    # 2. Si(111) slab, then strain its in-plane cell to the graphene cell.
-    slab = build_si111_slab(args.si_layers, args.si_nx, args.si_ny)
-    slab, strain_pct = strain_inplane_to(slab, g.cell)
-    n_si = len(slab)
-
-    # 3. Stack along z: Si slab at the bottom, graphene GAP above the top Si,
-    #    Li LI_HEIGHT above graphene.
-    slab_z = slab.get_positions()[:, 2]
-    slab.translate((0, 0, -slab_z.min()))            # bottom Si at z = 0
-    si_top = slab.get_positions()[:, 2].max()
-
-    # Zero graphene's own z-offset first (ase.build.graphene centers the sheet at
-    # a small non-zero z), so the gap below is applied exactly.
-    gpos = g.get_positions()
-    gpos[:, 2] -= gpos[:, 2].mean()
-    z_graphene = si_top + GAP_SI_GR
-    gpos[:, 2] += z_graphene
-    g.set_positions(gpos)
-
-    z_li = z_graphene + LI_HEIGHT
-    li = place_lithium(g.cell, z_li, args.n_li)
-    n_li = len(li)
-
-    # 4. Combine (carbons, then Si, then Li) in graphene's in-plane cell.
-    model = g + slab + li
-    cell = g.cell.copy()
-    cell[2] = (0.0, 0.0, z_li + VACUUM)              # total height incl. vacuum
-    model.set_cell(cell)
-    model.set_pbc([True, True, True])
+    # Assemble via the shared single-source builder (also used by Model B).
+    model, info = assemble_model_a(gx=args.gx, gy=args.gy,
+                                   si_nx=args.si_nx, si_ny=args.si_ny,
+                                   si_layers=args.si_layers, n_li=args.n_li)
+    n_c, n_si, n_li, strain_pct = info["n_c"], info["n_si"], info["n_li"], info["strain_pct"]
 
     # 5. Export.
     write(xyz_path, model, format="extxyz")

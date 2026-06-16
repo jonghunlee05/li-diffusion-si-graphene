@@ -8,12 +8,12 @@ volume changes and improves electrical conductivity. The behavior of lithium at 
 Si–graphene interface — especially around graphene defects — is central to rate
 performance and cycle life.
 
-> **Status: Phases 1–4 complete; Phase 5 next.**
+> **Status: Phases 1–5 complete; Phase 6 next.**
 > Toolchain validated (Phase 1), pristine graphene + Li structure built (Phase 2),
-> Li–Si–C ReaxFF QEq smoke test passed (Phase 3), and **Model A (pristine
-> Si–graphene–Li) minimizes and equilibrates without collapse** (Phase 4). **No
-> production MD has been run and no diffusion results exist yet.** Next: Phase 5 —
-> Model B (vacancy-defective graphene).
+> Li–Si–C ReaxFF QEq smoke test passed (Phase 3), **Model A (pristine
+> Si–graphene–Li)** (Phase 4) and **Model B (single-vacancy graphene)** (Phase 5)
+> both minimize and equilibrate without collapse. **No production MD has been run
+> and no diffusion results exist yet.** Next: Phase 6 — production MD.
 
 ---
 
@@ -24,7 +24,7 @@ the lithium diffusion coefficient and diffusion pathways near a silicon–graphe
 interface, and compare against pristine graphene as a baseline.
 
 This is the project's end goal. The phases below track progress toward it; Phases
-1–4 are complete and Phase 5 (Model B, vacancy-defective graphene) is next.
+1–5 are complete and Phase 6 (production MD) is next.
 
 ---
 
@@ -36,8 +36,8 @@ This is the project's end goal. The phases below track progress toward it; Phase
 | 2 | Graphene + Li structure | Build and validate a reproducible pristine graphene + lithium initial structure (no silicon, no defects). Export XYZ + LAMMPS data; sanity-check geometry; visualize in OVITO. | **Complete** |
 | 3 | Force-field / ReaxFF validation | Confirm the published Li–Si–C ReaxFF loads in LAMMPS, atom types map correctly, QEq runs, and a tiny test is stable. No invented parameters. | **Complete** |
 | 4 | Model A: pristine Si–graphene–Li | Build, minimize, and equilibrate the pristine Si–graphene interface with Li. | **Complete** |
-| 5 | Model B: defective Si–graphene–Li | Same as Model A plus a graphene vacancy defect; identical protocol. | **Active** |
-| 6 | Production MD | Run diffusion simulations for Models A and B. | Planned |
+| 5 | Model B: defective Si–graphene–Li | Same as Model A plus a graphene vacancy defect; identical protocol. | **Complete** |
+| 6 | Production MD | Run diffusion simulations for Models A and B. | **Active** |
 | 7 | MSD & diffusion analysis | Compute MSD, diffusion coefficients, and pathway statistics; compare defect vs. pristine. | Planned |
 
 ---
@@ -131,6 +131,39 @@ python analysis/check_model_a_logs.py
 Details and validation:
 [docs/phase4_model_a_construction.md](docs/phase4_model_a_construction.md) ·
 [notes/phase4_model_a_validation.md](notes/phase4_model_a_validation.md).
+
+---
+
+## Phase 5 (complete) — Model B: single-vacancy Si–graphene–Li
+
+Built the defective counterpart — **Model B = Si slab + single-vacancy graphene +
+Li** (48 Si + 17 C + 9 Li) — by importing Model A's exact builder and removing
+**one central carbon** (single vacancy; Si et al. [6] "SV defects are created by
+removing a C atom"; methodology, Qin [2]). Everything else is identical to Model
+A (box, Li, ReaxFF, QEq, protocol), verified by
+[analysis/compare_model_a_b_structures.py](analysis/compare_model_a_b_structures.py).
+The removed atom's id/coordinates are recorded in `model_b_sv_metadata.json`.
+Model B minimizes and equilibrates without collapse. **Structural validation
+only** — no DV5-8-5, no production MD, no diffusion.
+
+```bash
+# 1. Build + inspect + compare to Model A
+python structures/build_model_b_sv.py
+python analysis/inspect_model_b.py
+python analysis/compare_model_a_b_structures.py
+
+# 2. Minimize, then short NVT equilibration (same setup as Model A)
+lmp_serial -in lammps_inputs/in.model_b_minimize
+lmp_serial -in lammps_inputs/in.model_b_equilibrate_short
+
+# 3. Check logs; open trajectory in OVITO; save
+#    figures/phase5_model_b_sv_equilibrated.png
+python analysis/check_model_b_logs.py
+```
+
+Details and validation:
+[docs/phase5_model_b_construction.md](docs/phase5_model_b_construction.md) ·
+[notes/phase5_model_b_validation.md](notes/phase5_model_b_validation.md).
 
 ---
 

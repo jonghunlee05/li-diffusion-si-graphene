@@ -1,0 +1,50 @@
+# =====================================================================
+# in.model_b_equilibrate_short  --  Phase 5: Model B short NVT equilibration
+# =====================================================================
+# Reads the MINIMIZED Model B and runs a SHORT, conservative NVT equilibration
+# to confirm structural stability (no collapse, no explosion). This is NOT
+# production MD and NOT a diffusion run -- it is a brief stability check.
+#
+# Run: lmp_serial -in lammps_inputs/in.model_b_equilibrate_short
+#   (run in.model_b_minimize first)
+# =====================================================================
+
+variable REAXFF_FILE string "force_fields/ffield.reax.LiSiC_OlououGuifo2023.txt"
+variable TEQ         equal 300.0     # conservative equilibration temperature (K)
+                                     # (production temps are 800/1200 K [1,9];
+                                     #  300 K is a low, safe structural check)
+
+units           real
+atom_style      charge
+boundary        p p p
+
+read_data       structures/model_b_sv_minimized.data
+
+pair_style      reaxff NULL safezone 3.0 mincap 150
+pair_coeff      * * ${REAXFF_FILE} C Si Li
+fix             qeq all qeq/reaxff 1 0.0 10.0 1.0e-6 reaxff
+
+# Fix bottom Si layer (same as minimization); only the rest is mobile.
+region          bottom block INF INF INF INF INF 3.5 units box
+group           bottom region bottom
+group           mobile subtract all bottom
+fix             freeze bottom setforce 0.0 0.0 0.0
+
+# Output.
+log             logs/model_b_equilibrate_short.log
+thermo          25
+thermo_style    custom step temp pe etotal press
+dump            traj all atom 25 trajectories/model_b_equilibrate_short.lammpstrj
+
+# Initial velocities for the mobile atoms only (bottom stays put).
+velocity        mobile create ${TEQ} 48291 mom yes rot yes dist gaussian
+
+# Short NVT on the mobile atoms. Timestep 0.25 fs (Phase 3 conservative choice;
+# Olou'ou Guifo et al. [4] used 0.5 and 0.1 fs).
+fix             nvt mobile nvt temp ${TEQ} ${TEQ} 25.0
+timestep        0.25
+run             500          # 125 fs -- short stability check only
+
+write_data      structures/model_b_sv_equilibrated.data nocoeff
+
+print "Model B short equilibration done -> structures/model_b_sv_equilibrated.data"

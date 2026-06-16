@@ -1,0 +1,43 @@
+{
+  "model": "B (single-vacancy graphene)",
+  "derived_from": "Model A (build_model_a_pristine.assemble_model_a)",
+  "differs_from_model_a_by": "one removed central graphene carbon (single vacancy)",
+  "build_parameters": {
+    "gx": 3,
+    "gy": 3,
+    "si_nx": 2,
+    "si_ny": 2,
+    "si_layers": 6,
+    "n_li": 9
+  },
+  "removed_carbon": {
+    "index_0based_in_model_a": 9,
+    "lammps_id_1based_in_model_a": 10,
+    "element": "C",
+    "coordinates_xyz_A": [
+      2.467,
+      2.848646,
+      20.029639
+    ],
+    "selection_criterion": "carbon nearest the graphene in-plane centroid"
+  },
+  "atom_counts": {
+    "C_model_a": 18,
+    "C_model_b": 17,
+    "C_difference": 1,
+    "Si": 48,
+    "Li": 9,
+    "total": 74
+  },
+  "box_A": [
+    7.401,
+    7.401,
+    40.329639
+  ],
+  "type_order": [
+    "C",
+    "Si",
+    "Li"
+  ],
+  "literature_basis": "SV = remove one C atom (Si et al. [6], 'SV defects are created by removing a C atom'); methodology Sec. 5 'remove one central C atom for SV, keep all other variables identical to Model A' (Qin et al. [2])."
+}

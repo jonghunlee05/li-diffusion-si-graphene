@@ -1,0 +1,100 @@
+thermo          25
+thermo_style    custom step temp pe etotal press
+dump            traj all atom 25 trajectories/model_b_minimize.lammpstrj
+
+# Conjugate-gradient minimization (conservative tolerances / step caps).
+min_style       cg
+minimize        1.0e-4 1.0e-6 2000 20000
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Your simulation uses code contributions which should be cited:
+
+- pair reaxff command: doi:10.1016/j.parco.2011.08.005
+
+@Article{Aktulga12,
+ author = {H. M. Aktulga and J. C. Fogarty and S. A. Pandit and A. Y. Grama},
+ title = {Parallel Reactive Molecular Dynamics: {N}umerical Methods and Algorithmic Techniques},
+ journal = {Parallel Computing},
+ year =    2012,
+ volume =  38,
+ number =  {4--5},
+ pages =   {245--259}
+}
+
+- fix qeq/reaxff command: doi:10.1016/j.parco.2011.08.005
+
+@Article{Aktulga12,
+ author = {H. M. Aktulga and J. C. Fogarty and S. A. Pandit and A. Y. Grama},
+ title = {Parallel Reactive Molecular Dynamics: {N}umerical Methods and Algorithmic Techniques},
+ journal = {Parallel Computing},
+ year =    2012,
+ volume =  38,
+ pages =   {245--259}
+}
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 12
+  ghost atom cutoff = 12
+  binsize = 6, bins = 2 2 7
+  2 neighbor lists, perpetual/occasional/extra = 2 0 0
+  (1) pair reaxff, perpetual
+      attributes: half, newton off, ghost
+      pair build: half/bin/ghost/newtoff
+      stencil: full/ghost/bin/3d
+      bin: standard
+  (2) fix qeq/reaxff, perpetual, copy from (1)
+      attributes: half, newton off
+      pair build: copy
+      stencil: none
+      bin: none
+Per MPI rank memory allocation (min/avg/max) = 149.6 | 149.6 | 149.6 Mbytes
+   Step          Temp          PotEng         TotEng         Press     
+         0   0             -7173.8843     -7173.8843      74421.981    
+         3   0             -7245.6847     -7245.6847      69117.305    
+Loop time of 0.0990882 on 1 procs for 3 steps with 74 atoms
+
+99.2% CPU use with 1 MPI tasks x no OpenMP threads
+
+Minimization stats:
+  Stopping criterion = energy tolerance
+  Energy initial, next-to-last, final = 
+     -7173.88428904211  -7245.19073000902  -7245.68465513034
+  Force two-norm initial, final = 407.9479 1122.6533
+  Force max component initial, final = 145.9151 357.75214
+  Final line search alpha, max atom move = 6.7691223e-05 0.02421668
+  Iterations, force evaluations = 3 6
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.091031   | 0.091031   | 0.091031   |   0.0 | 91.87
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 6.3123e-05 | 6.3123e-05 | 6.3123e-05 |   0.0 |  0.06
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0.007875   | 0.007875   | 0.007875   |   0.0 |  7.95
+Other   |            | 0.000119   |            |       |  0.12
+
+Nlocal:             74 ave          74 max          74 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           2366 ave        2366 max        2366 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:          25905 ave       25905 max       25905 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 25905
+Ave neighs/atom = 350.06757
+Neighbor list builds = 0
+Dangerous builds = 0
+
+# Save the minimized structure for the equilibration step.
+write_data      structures/model_b_sv_minimized.data nocoeff
+System init for write_data ...
+
+print "Model B minimization done -> structures/model_b_sv_minimized.data"
+Model B minimization done -> structures/model_b_sv_minimized.data
+Total wall time: 0:00:00

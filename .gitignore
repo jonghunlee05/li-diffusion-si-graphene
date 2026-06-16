@@ -38,5 +38,9 @@ structures/graphene_li.data
 !trajectories/model_a_minimize.lammpstrj
 !trajectories/model_a_equilibrate_short.lammpstrj
 
+# ---- Phase 5 Model B outputs: KEPT as validation evidence ----
+!trajectories/model_b_minimize.lammpstrj
+!trajectories/model_b_equilibrate_short.lammpstrj
+
 # ---- Generated figures (uncomment to ignore; kept by default as validation artifacts) ----
 # figures/*.png

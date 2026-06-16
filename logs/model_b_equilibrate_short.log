@@ -1,0 +1,118 @@
+thermo          25
+thermo_style    custom step temp pe etotal press
+dump            traj all atom 25 trajectories/model_b_equilibrate_short.lammpstrj
+
+# Initial velocities for the mobile atoms only (bottom stays put).
+velocity        mobile create ${TEQ} 48291 mom yes rot yes dist gaussian
+velocity        mobile create 300 48291 mom yes rot yes dist gaussian
+
+# Short NVT on the mobile atoms. Timestep 0.25 fs (Phase 3 conservative choice;
+# Olou'ou Guifo et al. [4] used 0.5 and 0.1 fs).
+fix             nvt mobile nvt temp ${TEQ} ${TEQ} 25.0
+fix             nvt mobile nvt temp 300 ${TEQ} 25.0
+fix             nvt mobile nvt temp 300 300 25.0
+timestep        0.25
+run             500          # 125 fs -- short stability check only
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Your simulation uses code contributions which should be cited:
+
+- pair reaxff command: doi:10.1016/j.parco.2011.08.005
+
+@Article{Aktulga12,
+ author = {H. M. Aktulga and J. C. Fogarty and S. A. Pandit and A. Y. Grama},
+ title = {Parallel Reactive Molecular Dynamics: {N}umerical Methods and Algorithmic Techniques},
+ journal = {Parallel Computing},
+ year =    2012,
+ volume =  38,
+ number =  {4--5},
+ pages =   {245--259}
+}
+
+- fix qeq/reaxff command: doi:10.1016/j.parco.2011.08.005
+
+@Article{Aktulga12,
+ author = {H. M. Aktulga and J. C. Fogarty and S. A. Pandit and A. Y. Grama},
+ title = {Parallel Reactive Molecular Dynamics: {N}umerical Methods and Algorithmic Techniques},
+ journal = {Parallel Computing},
+ year =    2012,
+ volume =  38,
+ pages =   {245--259}
+}
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 12
+  ghost atom cutoff = 12
+  binsize = 6, bins = 2 2 7
+  2 neighbor lists, perpetual/occasional/extra = 2 0 0
+  (1) pair reaxff, perpetual
+      attributes: half, newton off, ghost
+      pair build: half/bin/ghost/newtoff
+      stencil: full/ghost/bin/3d
+      bin: standard
+  (2) fix qeq/reaxff, perpetual, copy from (1)
+      attributes: half, newton off
+      pair build: copy
+      stencil: none
+      bin: none
+Per MPI rank memory allocation (min/avg/max) = 148.1 | 148.1 | 148.1 Mbytes
+   Step          Temp          PotEng         TotEng         Press     
+         0   250.68493     -7245.6847     -7191.1358      70420.719    
+        25   319.68937     -7261.5325     -7191.9683      87716.4      
+        50   382.58618     -7278.6495     -7195.399       74292.543    
+        75   413.65579     -7294.0939     -7204.0828      112860.28    
+       100   432.55972     -7310.3921     -7216.2675      105756.61    
+       125   488.79486     -7334.1061     -7227.7448      76651.115    
+       150   519.63289     -7355.7864     -7242.7148      76254.77     
+       175   518.73336     -7375.7342     -7262.8583      119528.99    
+       200   527.68895     -7398.7877     -7283.963       77284.989    
+       225   499.26036     -7414.9104     -7306.2718      59481.067    
+       250   595.8803      -7460.6844     -7331.0214      71978.117    
+       275   490.13803     -7462.6017     -7355.9481      72935.693    
+       300   411.99288     -7465.69       -7376.0407      84327.311    
+       325   375.47558     -7474.1533     -7392.4501      78749.532    
+       350   398.39332     -7493.9972     -7407.3072      63937.045    
+       375   403.19081     -7511.3192     -7423.5852      66574.712    
+       400   396.65759     -7525.8119     -7439.4996      51687.298    
+       425   364.87286     -7534.0651     -7454.6691      58214.099    
+       450   348.42149     -7544.0412     -7468.225       53522.547    
+       475   401.87983     -7570.0896     -7482.6409      38736.638    
+       500   384.50675     -7582.2985     -7498.6302      34683.399    
+Loop time of 6.35817 on 1 procs for 500 steps with 74 atoms
+
+Performance: 1.699 ns/day, 14.129 hours/ns, 78.639 timesteps/s, 5.819 katom-step/s
+97.4% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 6.031      | 6.031      | 6.031      |   0.0 | 94.85
+Neigh   | 0.018893   | 0.018893   | 0.018893   |   0.0 |  0.30
+Comm    | 0.0046317  | 0.0046317  | 0.0046317  |   0.0 |  0.07
+Output  | 0.0016403  | 0.0016403  | 0.0016403  |   0.0 |  0.03
+Modify  | 0.30091    | 0.30091    | 0.30091    |   0.0 |  4.73
+Other   |            | 0.001059   |            |       |  0.02
+
+Nlocal:             74 ave          74 max          74 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           2361 ave        2361 max        2361 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:          25155 ave       25155 max       25155 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 25155
+Ave neighs/atom = 339.93243
+Neighbor list builds = 3
+Dangerous builds = 0
+
+write_data      structures/model_b_sv_equilibrated.data nocoeff
+System init for write_data ...
+
+print "Model B short equilibration done -> structures/model_b_sv_equilibrated.data"
+Model B short equilibration done -> structures/model_b_sv_equilibrated.data
+Total wall time: 0:00:06
