@@ -1,0 +1,78 @@
+# =====================================================================
+# in.production_ramp  --  Phase 6: staged temperature-ramp production
+# =====================================================================
+# ONE parameterized NVT production stage. Drive it from the command line so every
+# stage / model uses byte-identical physics -- only the temperature changes:
+#
+#   lmp_serial -in lammps_inputs/in.production_ramp \
+#       -var MODEL model_a \
+#       -var INDATA structures/model_a_pristine_equilibrated.data \
+#       -var TSTAGE 300 -var STAGE 300K
+#
+# Then the next stage reads the PREVIOUS stage's final state (continuous heat-up):
+#   ... -var INDATA structures/model_a_ramp_300K_final.data -var TSTAGE 600 -var STAGE 600K
+#
+# Climb 300 -> 600 -> 900 -> 1200 K, ~10 ps each, verifying each stage in OVITO.
+#
+# Design (permeation): Li start ABOVE graphene; a reflecting z-wall keeps them in
+# the system; the graphene COM-z is pinned (position AND velocity) so the membrane
+# stays the barrier without the anchor pumping energy. Phase 6 = trajectory only,
+# NO MSD / diffusion. Settings: docs/phase6_production_settings.md.
+#
+# Command-line vars (via -var): MODEL, INDATA, TSTAGE (K), STAGE (label).
+# =====================================================================
+
+variable REAXFF_FILE string "force_fields/ffield.reax.LiSiC_OlououGuifo2023.txt"
+variable NSTEPS    equal 40000      # 40000 * 0.25 fs = 10 ps per stage
+variable DT        equal 0.25       # fs -- validated timestep
+variable TDAMP     equal 25.0       # fs -- Nose-Hoover damping
+variable WALLZ     equal 35.0       # A -- reflecting containment wall above Li
+variable DUMPEVERY equal 100        # dump every 100 steps (25 fs)
+
+units           real
+atom_style      charge
+# z non-periodic so the reflecting wall can act; 18 A vacuum prevents across-z
+# interaction. Continuous heat-up: this stage reads the previous stage's state.
+boundary        p p f
+
+read_data       ${INDATA}
+
+# Validated ReaxFF + QEq (Phases 3-5); types 1=C, 2=Si, 3=Li.
+pair_style      reaxff NULL safezone 3.0 mincap 150
+pair_coeff      * * ${REAXFF_FILE} C Si Li
+fix             qeq all qeq/reaxff 1 0.0 10.0 1.0e-6 reaxff
+
+# Bottom Si fixed (no H in ffield): zero force AND velocity.
+region          bottom block INF INF INF INF INF 3.5 units box
+group           bottom region bottom
+group           mobile subtract all bottom
+fix             freeze bottom setforce 0.0 0.0 0.0
+velocity        bottom set 0.0 0.0 0.0
+
+# Graphene membrane anchor: pin COM-z position (recenter) AND zero COM-z velocity
+# (momentum) so the anchor does not inject energy / inflate the temperature.
+group           graphene type 1
+fix             grcom graphene recenter NULL NULL INIT units box
+fix             gmom graphene momentum 1 linear 0 0 1
+
+# Reflecting containment wall ABOVE the Li (no force unless an atom reaches it).
+fix             topwall all wall/reflect zhi ${WALLZ}
+
+# Mobile-group temperature (the thermostatted region).
+compute         ctemp mobile temp
+
+log             logs/${MODEL}_ramp_${STAGE}.log
+thermo          100
+thermo_style    custom step temp c_ctemp pe ke etotal press
+dump            traj all custom ${DUMPEVERY} trajectories/${MODEL}_ramp_${STAGE}.lammpstrj id type xu yu zu
+dump_modify     traj sort id
+
+# CONTINUOUS HEAT-UP: NO velocity re-initialization. The carried-over state is
+# brought to TSTAGE by the thermostat (the start structure is ~300 K from
+# Phase 4/5 equilibration; each later stage continues from the previous final).
+fix             nvt mobile nvt temp ${TSTAGE} ${TSTAGE} ${TDAMP}
+timestep        ${DT}
+run             ${NSTEPS}
+
+write_data      structures/${MODEL}_ramp_${STAGE}_final.data nocoeff
+print "${MODEL} ramp stage ${STAGE} (T=${TSTAGE} K) done -> structures/${MODEL}_ramp_${STAGE}_final.data"

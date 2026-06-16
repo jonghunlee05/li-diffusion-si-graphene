@@ -42,5 +42,19 @@ structures/graphene_li.data
 !trajectories/model_b_minimize.lammpstrj
 !trajectories/model_b_equilibrate_short.lammpstrj
 
+# ---- Phase 6 production trajectories: KEPT as validation evidence ----
+!trajectories/model_a_production.lammpstrj
+!trajectories/model_b_production.lammpstrj
+
+# ---- Phase 6 staged-ramp trajectories (300/600/900/1200 K): KEPT for Phase 7 MSD ----
+!trajectories/model_a_ramp_300K.lammpstrj
+!trajectories/model_a_ramp_600K.lammpstrj
+!trajectories/model_a_ramp_900K.lammpstrj
+!trajectories/model_a_ramp_1200K.lammpstrj
+!trajectories/model_b_ramp_300K.lammpstrj
+!trajectories/model_b_ramp_600K.lammpstrj
+!trajectories/model_b_ramp_900K.lammpstrj
+!trajectories/model_b_ramp_1200K.lammpstrj
+
 # ---- Generated figures (uncomment to ignore; kept by default as validation artifacts) ----
 # figures/*.png

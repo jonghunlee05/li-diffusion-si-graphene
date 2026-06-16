@@ -1,0 +1,92 @@
+# =====================================================================
+# in.model_a_production  --  Phase 6: Model A production MD (NVT, ReaxFF)
+# =====================================================================
+# Production NVT run for Model A (pristine Si-graphene-Li). Li START ABOVE the
+# graphene (the permeation design): the run watches whether Li penetrate THROUGH
+# the graphene toward the Si. Generates a trajectory for Phase 7 Li-MSD analysis.
+#
+# Phase 6 produces a trajectory ONLY -- no MSD, no diffusion, no conclusions.
+# Model B uses an identical input except file paths.
+#
+# CONTAINMENT (not a force): a reflecting z-wall sits ABOVE the Li region so the
+# Li cannot evaporate into the vacuum (which would break the MSD). The wall does
+# NOT push Li down, does NOT freeze/restrain Li, and no Li are deleted. The
+# graphene COM-z is pinned so the membrane stays put (Li can still cross it).
+#
+# Settings summary: docs/phase6_production_settings.md
+# Run: lmp_serial -in lammps_inputs/in.model_a_production
+# =====================================================================
+
+# ---- Production settings (identical for Model A and Model B) ----------
+variable REAXFF_FILE string "force_fields/ffield.reax.LiSiC_OlououGuifo2023.txt"
+variable TPROD     equal 1200.0     # production temperature (K) -- Si et al. [9]
+variable NSTEPS    equal 80000      # 80000 * 0.25 fs = 20 ps
+variable DT        equal 0.25       # fs -- timestep validated in Phases 4/5
+variable TDAMP     equal 25.0       # fs -- Nose-Hoover damping (= Phase 4/5)
+variable DUMPEVERY equal 100        # dump every 100 steps (25 fs) -> 800 frames
+variable SEED      equal 90210      # velocity seed (same for both models)
+variable WALLZ     equal 35.0       # A -- reflecting wall ABOVE the Li region.
+                                    # Li start ~22 A and naturally reach ~32 A at
+                                    # 1200 K; wall at 35 leaves ~2.5 A headroom (no
+                                    # compression) while capping evaporation. Box
+                                    # top ~40 A -> ~5 A vacuum buffer above the wall.
+
+units           real
+atom_style      charge
+# z is NON-periodic (fixed) so the reflecting containment wall can act in z; the
+# 18 A vacuum already prevents any across-z interaction. x,y stay periodic.
+boundary        p p f
+
+# Start from the EQUILIBRATED Model A structure (Phase 4) -- Li above graphene.
+read_data       structures/model_a_pristine_equilibrated.data
+
+# Validated ReaxFF + QEq (identical to Phases 3-5); types 1=C, 2=Si, 3=Li.
+pair_style      reaxff NULL safezone 3.0 mincap 150
+pair_coeff      * * ${REAXFF_FILE} C Si Li
+fix             qeq all qeq/reaxff 1 0.0 10.0 1.0e-6 reaxff
+
+# Fix the bottom Si layer (no H passivation -- ffield has no H). Zero force AND
+# velocity so the un-thermostatted bottom does not drift.
+region          bottom block INF INF INF INF INF 3.5 units box
+group           bottom region bottom
+group           mobile subtract all bottom
+fix             freeze bottom setforce 0.0 0.0 0.0
+velocity        bottom set 0.0 0.0 0.0
+
+# Anchor the graphene membrane against rigid-body z-drift (desorption into the
+# vacuum is a finite-slab artifact). Pins ONLY the sheet COM-z; in-plane motion,
+# per-carbon vibration, and ALL Li motion (including crossing the sheet) are free.
+group           graphene type 1
+fix             grcom graphene recenter NULL NULL INIT units box
+# Also zero the graphene COM-z VELOCITY each step. recenter fixes the position
+# but not the velocity; without this, graphene's residual upward COM-z momentum
+# (strong for pristine graphene, which pushes hard against the anchor) shows up
+# as excess kinetic energy and inflates the measured temperature -- biasing the
+# A-vs-B comparison. Zeroing it keeps both models at the 1200 K setpoint.
+fix             gmom graphene momentum 1 linear 0 0 1
+
+# CONTAINMENT WALL: reflect atoms at z = WALLZ so Li cannot evaporate upward.
+# Reflecting only -- it imparts no force unless an atom reaches the wall.
+fix             topwall all wall/reflect zhi ${WALLZ}
+
+# Mobile-group temperature (global 'Temp' is diluted by the fixed bottom atoms).
+compute         ctemp mobile temp
+
+# Output.
+log             logs/model_a_production.log
+thermo          100
+thermo_style    custom step temp c_ctemp pe ke etotal press
+# Unwrapped coords (xu yu zu) so Phase 7 can compute Li MSD across PBC.
+dump            traj all custom ${DUMPEVERY} trajectories/model_a_production.lammpstrj id type xu yu zu
+dump_modify     traj sort id
+
+# Initialize mobile-atom velocities at the production temperature.
+velocity        mobile create ${TPROD} ${SEED} mom yes rot yes dist gaussian
+
+# NVT (Nose-Hoover) production.
+fix             nvt mobile nvt temp ${TPROD} ${TPROD} ${TDAMP}
+timestep        ${DT}
+run             ${NSTEPS}
+
+write_data      structures/model_a_production_final.data nocoeff
+print "Model A production done -> structures/model_a_production_final.data"

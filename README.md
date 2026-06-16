@@ -167,6 +167,48 @@ Details and validation:
 
 ---
 
+## Phase 6 — production MD (Models A & B)
+
+Production **NVT** MD (0.25 fs) for both models from their equilibrated
+structures, generating trajectories for Phase 7 Li-MSD analysis. Identical settings
+for A and B (only paths differ). **Permeation design:** Li start **above** the
+graphene and the run watches whether they cross **through** it (vacancy in B)
+toward the Si. A reflecting **z-wall above the Li** keeps them in the system (so the
+MSD stays valid — no evaporation, no force/freezing/deletion), and the graphene
+COM-z is pinned so the membrane stays the barrier while Li can still cross it. Dump
+uses **unwrapped** coords for MSD. **Trajectories only — no MSD, no diffusion, no
+conclusions** (that is Phase 7). Settings:
+[docs/phase6_production_settings.md](docs/phase6_production_settings.md).
+
+Two run modes share the same physics: a single constant-**1200 K** production
+(20 ps), and a **staged temperature ramp** — 300 → 600 → 900 → 1200 K, ~10 ps per
+stage, continuous heat-up (`in.production_ramp`). The ramp was run and validated on
+2026-06-16 (8 stages, all stable; mobile T tracks each setpoint within ~12 K; **no
+Li evaporated** — highest Li reached 27.3 Å vs the 35 Å wall).
+
+```bash
+# Constant-1200K production (~15-20 min each):
+lmp_serial -in lammps_inputs/in.model_a_production
+lmp_serial -in lammps_inputs/in.model_b_production
+
+# OR staged ramp — one parameterized stage, repeat per T and per model:
+lmp_serial -in lammps_inputs/in.production_ramp -var MODEL model_a \
+  -var INDATA structures/model_a_pristine_equilibrated.data -var TSTAGE 300 -var STAGE 300K
+# ... 600/900/1200 K read the previous stage's *_ramp_*_final.data
+
+# Check logs (completion, NaN, QEq, temp/energy, same protocol) + plots
+python analysis/check_production_logs.py
+python analysis/plot_temperature_energy.py       # constant-1200K production
+python analysis/plot_temperature_energy_ramp.py  # staged ramp (4 stages, one ps axis)
+# then open trajectories in OVITO (Wrap at periodic boundaries ON)
+```
+
+Details and validation:
+[docs/phase6_production_md.md](docs/phase6_production_md.md) ·
+[notes/phase6_production_validation.md](notes/phase6_production_validation.md).
+
+---
+
 ## Repository layout
 
 ```
