@@ -8,7 +8,7 @@
     "si_nx": 2,
     "si_ny": 2,
     "si_layers": 6,
-    "n_li": 9
+    "n_li": 4
   },
   "removed_carbon": {
     "index_0based_in_model_a": 9,
@@ -26,8 +26,8 @@
     "C_model_b": 17,
     "C_difference": 1,
     "Si": 48,
-    "Li": 9,
-    "total": 74
+    "Li": 4,
+    "total": 69
   },
   "box_A": [
     7.401,

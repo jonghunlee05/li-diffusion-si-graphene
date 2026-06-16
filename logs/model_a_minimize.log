@@ -52,42 +52,42 @@ Neighbor list info ...
       pair build: copy
       stencil: none
       bin: none
-Per MPI rank memory allocation (min/avg/max) = 151.7 | 151.7 | 151.7 Mbytes
+Per MPI rank memory allocation (min/avg/max) = 138.2 | 138.2 | 138.2 Mbytes
    Step          Temp          PotEng         TotEng         Press     
-         0   0             -7482.8149     -7482.8149      89770.61     
-         2   0             -7489.1508     -7489.1508      73537.983    
-Loop time of 0.0685607 on 1 procs for 2 steps with 75 atoms
+         0   0             -7361.0669     -7361.0669      51257.437    
+        19   0             -7419.4427     -7419.4427      63388.239    
+Loop time of 0.509629 on 1 procs for 19 steps with 70 atoms
 
-98.2% CPU use with 1 MPI tasks x no OpenMP threads
+99.6% CPU use with 1 MPI tasks x no OpenMP threads
 
 Minimization stats:
   Stopping criterion = energy tolerance
   Energy initial, next-to-last, final = 
-     -7482.81485222277  -7489.08622081707  -7489.15080393109
-  Force two-norm initial, final = 229.74074 501.05044
-  Force max component initial, final = 57.835431 265.09192
-  Final line search alpha, max atom move = 0.00032769133 0.086868326
-  Iterations, force evaluations = 2 4
+     -7361.06692106805  -7418.89122164785  -7419.44269115508
+  Force two-norm initial, final = 919.17933 66.41685
+  Force max component initial, final = 372.05397 22.698757
+  Final line search alpha, max atom move = 0.00075937975 0.017236976
+  Iterations, force evaluations = 19 43
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.062686   | 0.062686   | 0.062686   |   0.0 | 91.43
+Pair    | 0.46582    | 0.46582    | 0.46582    |   0.0 | 91.40
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 4.4666e-05 | 4.4666e-05 | 4.4666e-05 |   0.0 |  0.07
+Comm    | 0.00034954 | 0.00034954 | 0.00034954 |   0.0 |  0.07
 Output  | 0          | 0          | 0          |   0.0 |  0.00
-Modify  | 0.005701   | 0.005701   | 0.005701   |   0.0 |  8.32
-Other   |            | 0.0001286  |            |       |  0.19
+Modify  | 0.043168   | 0.043168   | 0.043168   |   0.0 |  8.47
+Other   |            | 0.0002942  |            |       |  0.06
 
-Nlocal:             75 ave          75 max          75 min
+Nlocal:             70 ave          70 max          70 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
-Nghost:           2390 ave        2390 max        2390 min
+Nghost:           2270 ave        2270 max        2270 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
-Neighs:          26655 ave       26655 max       26655 min
+Neighs:          23502 ave       23502 max       23502 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
 
-Total # of neighbors = 26655
-Ave neighs/atom = 355.4
+Total # of neighbors = 23502
+Ave neighs/atom = 335.74286
 Neighbor list builds = 0
 Dangerous builds = 0
 

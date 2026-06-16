@@ -56,7 +56,7 @@ Type order (matches Phase 3): type 1 = C, type 2 = Si, type 3 = Li
 
 Usage:
     python structures/build_model_a_pristine.py
-    python structures/build_model_a_pristine.py --si-layers 6 --n-li 9
+    python structures/build_model_a_pristine.py --si-layers 6 --n-li 4
 """
 
 import argparse
@@ -178,10 +178,10 @@ def min_dist(atoms, idx_a, idx_b):
 
 
 # Shared default build parameters (so Model B can reuse EXACTLY Model A's build).
-DEFAULTS = dict(gx=3, gy=3, si_nx=2, si_ny=2, si_layers=6, n_li=9)
+DEFAULTS = dict(gx=3, gy=3, si_nx=2, si_ny=2, si_layers=6, n_li=4)
 
 
-def assemble_model_a(gx=3, gy=3, si_nx=2, si_ny=2, si_layers=6, n_li=9):
+def assemble_model_a(gx=3, gy=3, si_nx=2, si_ny=2, si_layers=6, n_li=4):
     """
     Assemble the Model A structure (pristine Si-graphene-Li) and return
     (model, info_dict). This is the SINGLE SOURCE OF TRUTH for the Model A/B
@@ -232,7 +232,7 @@ def main():
     ap.add_argument("--si-ny", type=int, default=2, help="Si(111) cells along a2 (default 2)")
     ap.add_argument("--si-layers", type=int, default=6,
                     help="Si(111) atomic layers (default 6; project choice)")
-    ap.add_argument("--n-li", type=int, default=9,
+    ap.add_argument("--n-li", type=int, default=4,
                     help="number of Li atoms above graphene (default 9; project choice)")
     args = ap.parse_args()
 
