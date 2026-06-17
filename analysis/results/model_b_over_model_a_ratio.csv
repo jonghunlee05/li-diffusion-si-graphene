@@ -1,0 +1,6 @@
+# Phase 7: D_B/D_A by component. APPARENT, comparative-only under this MD protocol -- NOT a real-battery claim.
+# 'similar' = |ratio-1| <= 0.15; z is confined (ratio not meaningful).
+component,D_A_cm2_s,D_B_cm2_s,ratio_B_over_A,verdict,regime_A,regime_B,note
+3d,4.843560e-03,4.777624e-03,0.986387,similar,super-diffusive (slope rising; no clear Fickian regime),approximately linear,super-diffusive window; apparent ratio only
+xy,7.264672e-03,7.167435e-03,0.986615,similar,super-diffusive (slope rising; no clear Fickian regime),approximately linear,super-diffusive window; apparent ratio only
+z,1.337221e-06,-1.996106e-06,-1.492727,undetermined (confined),confined plateau (no diffusion; D not physically meaningful),confined plateau (no diffusion; D not physically meaningful),z is a confined plateau; ratio not physically meaningful

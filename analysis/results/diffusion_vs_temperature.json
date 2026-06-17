@@ -1,0 +1,239 @@
+{
+  "unit_conversion": "D[cm^2/s] = D[A^2/ps]*1e-4",
+  "dimension_divisors": {
+    "3d": 6.0,
+    "xy": 4.0,
+    "z": 2.0
+  },
+  "window_source": "analysis/fit_windows_by_temperature.json",
+  "data": {
+    "model_a": {
+      "300": {
+        "fit_start_ps": 1.0,
+        "fit_end_ps": 5.0,
+        "n_points": 161,
+        "components": {
+          "3d": {
+            "slope_A2_per_ps": 43.92762713986658,
+            "D_cm2_per_s": 0.0007321271189977764,
+            "r2": 0.9806328824001603,
+            "linearity_ratio": 1.751594648252171,
+            "regime": "super-diffusive"
+          },
+          "xy": {
+            "slope_A2_per_ps": 43.92621730216242,
+            "D_cm2_per_s": 0.0010981554325540607,
+            "r2": 0.9806238481576061,
+            "linearity_ratio": 1.7518558040913377,
+            "regime": "super-diffusive"
+          },
+          "z": {
+            "slope_A2_per_ps": 0.0014098487462617794,
+            "D_cm2_per_s": 7.049243731308898e-08,
+            "r2": 0.014257030494329248,
+            "linearity_ratio": 0.005835017480128086,
+            "regime": "confined plateau"
+          }
+        }
+      },
+      "600": {
+        "fit_start_ps": 1.0,
+        "fit_end_ps": 5.0,
+        "n_points": 161,
+        "components": {
+          "3d": {
+            "slope_A2_per_ps": 312.36721927605254,
+            "D_cm2_per_s": 0.005206120321267543,
+            "r2": 0.9757048190861223,
+            "linearity_ratio": 1.8814393438530426,
+            "regime": "super-diffusive"
+          },
+          "xy": {
+            "slope_A2_per_ps": 312.32875174166094,
+            "D_cm2_per_s": 0.007808218793541524,
+            "r2": 0.9756706620846954,
+            "linearity_ratio": 1.8821895778661528,
+            "regime": "super-diffusive"
+          },
+          "z": {
+            "slope_A2_per_ps": 0.0384675295606165,
+            "D_cm2_per_s": 1.923376478030825e-06,
+            "r2": 0.4656189006581396,
+            "linearity_ratio": -0.25359043106988166,
+            "regime": "confined plateau"
+          }
+        }
+      },
+      "900": {
+        "fit_start_ps": 1.0,
+        "fit_end_ps": 5.0,
+        "n_points": 161,
+        "components": {
+          "3d": {
+            "slope_A2_per_ps": 450.4736928957903,
+            "D_cm2_per_s": 0.007507894881596505,
+            "r2": 0.9722995334572747,
+            "linearity_ratio": 1.9691877703249774,
+            "regime": "super-diffusive"
+          },
+          "xy": {
+            "slope_A2_per_ps": 450.5237414871175,
+            "D_cm2_per_s": 0.011263093537177938,
+            "r2": 0.9722994703265425,
+            "linearity_ratio": 1.969591920119739,
+            "regime": "super-diffusive"
+          },
+          "z": {
+            "slope_A2_per_ps": -0.050048615366919944,
+            "D_cm2_per_s": -2.5024307683459975e-06,
+            "r2": 0.3389961448030988,
+            "linearity_ratio": -0.3160773898893561,
+            "regime": "confined plateau"
+          }
+        }
+      },
+      "1200": {
+        "fit_start_ps": 1.0,
+        "fit_end_ps": 5.0,
+        "n_points": 161,
+        "components": {
+          "3d": {
+            "slope_A2_per_ps": 290.6136075791351,
+            "D_cm2_per_s": 0.004843560126318918,
+            "r2": 0.976893561938112,
+            "linearity_ratio": 1.8600311144800028,
+            "regime": "super-diffusive"
+          },
+          "xy": {
+            "slope_A2_per_ps": 290.5868631487233,
+            "D_cm2_per_s": 0.0072646715787180825,
+            "r2": 0.9768904349900496,
+            "linearity_ratio": 1.8602457270257815,
+            "regime": "super-diffusive"
+          },
+          "z": {
+            "slope_A2_per_ps": 0.026744418564527278,
+            "D_cm2_per_s": 1.337220928226364e-06,
+            "r2": 0.1745936962419532,
+            "linearity_ratio": 0.9521793070622117,
+            "regime": "confined plateau"
+          }
+        }
+      }
+    },
+    "model_b": {
+      "300": {
+        "fit_start_ps": 1.0,
+        "fit_end_ps": 5.0,
+        "n_points": 161,
+        "components": {
+          "3d": {
+            "slope_A2_per_ps": 2.9680511498734767,
+            "D_cm2_per_s": 4.946751916455795e-05,
+            "r2": 0.6358160546342789,
+            "linearity_ratio": -0.38468169142659914,
+            "regime": "sub-diffusive"
+          },
+          "xy": {
+            "slope_A2_per_ps": 2.972357013227513,
+            "D_cm2_per_s": 7.430892533068783e-05,
+            "r2": 0.6372335586554327,
+            "linearity_ratio": -0.3852478812060554,
+            "regime": "sub-diffusive"
+          },
+          "z": {
+            "slope_A2_per_ps": -0.00430587865194392,
+            "D_cm2_per_s": -2.1529393259719601e-07,
+            "r2": 0.04570011698193088,
+            "linearity_ratio": -0.24699145549463686,
+            "regime": "confined plateau"
+          }
+        }
+      },
+      "600": {
+        "fit_start_ps": 1.0,
+        "fit_end_ps": 5.0,
+        "n_points": 161,
+        "components": {
+          "3d": {
+            "slope_A2_per_ps": 48.01607247009433,
+            "D_cm2_per_s": 0.0008002678745015722,
+            "r2": 0.9812289951326733,
+            "linearity_ratio": 1.5302766388667381,
+            "regime": "super-diffusive"
+          },
+          "xy": {
+            "slope_A2_per_ps": 47.99533829871176,
+            "D_cm2_per_s": 0.001199883457467794,
+            "r2": 0.9812392057269169,
+            "linearity_ratio": 1.5303022987095594,
+            "regime": "super-diffusive"
+          },
+          "z": {
+            "slope_A2_per_ps": 0.02073420439383483,
+            "D_cm2_per_s": 1.0367102196917414e-06,
+            "r2": 0.770405345349698,
+            "linearity_ratio": 1.482331026858798,
+            "regime": "confined plateau"
+          }
+        }
+      },
+      "900": {
+        "fit_start_ps": 1.0,
+        "fit_end_ps": 5.0,
+        "n_points": 161,
+        "components": {
+          "3d": {
+            "slope_A2_per_ps": 60.636129341844956,
+            "D_cm2_per_s": 0.0010106021556974159,
+            "r2": 0.9945107878997419,
+            "linearity_ratio": 0.8401240773197748,
+            "regime": "~linear"
+          },
+          "xy": {
+            "slope_A2_per_ps": 60.63219327444215,
+            "D_cm2_per_s": 0.001515804831861054,
+            "r2": 0.9945275523174958,
+            "linearity_ratio": 0.8411072376778895,
+            "regime": "~linear"
+          },
+          "z": {
+            "slope_A2_per_ps": 0.003936104784909191,
+            "D_cm2_per_s": 1.9680523924545955e-07,
+            "r2": 0.007466990588923861,
+            "linearity_ratio": -0.8254828676402886,
+            "regime": "confined plateau"
+          }
+        }
+      },
+      "1200": {
+        "fit_start_ps": 1.0,
+        "fit_end_ps": 5.0,
+        "n_points": 161,
+        "components": {
+          "3d": {
+            "slope_A2_per_ps": 286.6574682132505,
+            "D_cm2_per_s": 0.004777624470220843,
+            "r2": 0.9967743242557462,
+            "linearity_ratio": 1.0788059431818855,
+            "regime": "~linear"
+          },
+          "xy": {
+            "slope_A2_per_ps": 286.6973903069934,
+            "D_cm2_per_s": 0.007167434757674835,
+            "r2": 0.9967786525373491,
+            "linearity_ratio": 1.0782503950479614,
+            "regime": "~linear"
+          },
+          "z": {
+            "slope_A2_per_ps": -0.03992212594893066,
+            "D_cm2_per_s": -1.996106297446533e-06,
+            "r2": 0.2538146471914372,
+            "linearity_ratio": -0.4741484295077913,
+            "regime": "confined plateau"
+          }
+        }
+      }
+    }
+  }
+}

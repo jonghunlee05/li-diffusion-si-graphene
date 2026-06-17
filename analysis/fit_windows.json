@@ -1,0 +1,6 @@
+{
+  "_comment": "Phase 7 MSD linear-fit windows (ps), chosen AFTER inspecting the MSD curves (plot_msd.py). NOT chosen blindly.",
+  "_rule": "Skip the sub-ps ballistic onset; fit only where time origins are statistically adequate (n_origins >= ~50% of frames, i.e. lag <= ~5 ps for a 10 ps / 401-frame trajectory); apply the SAME window to Model A and Model B. NOTE: the x-y/3D MSD is super-diffusive (local slope keeps rising) and the z MSD is a confined plateau, so NO clean Fickian regime exists -- the window below yields APPARENT, comparative-only slopes, not physical diffusion coefficients. See notes/phase7_msd_diffusion_analysis.md.",
+  "model_a": { "fit_start_ps": 1.0, "fit_end_ps": 5.0 },
+  "model_b": { "fit_start_ps": 1.0, "fit_end_ps": 5.0 }
+}

@@ -1,0 +1,81 @@
+{
+  "fit_window_source": "CLI (--fit-start 1.0 --fit-end 5.0, both models)",
+  "unit_conversion": "D[cm^2/s] = D[A^2/ps] * 1e-4",
+  "dimension_divisors": {
+    "3d": 6.0,
+    "xy": 4.0,
+    "z": 2.0
+  },
+  "models": {
+    "model_a": {
+      "fit_start_ps": 1.0,
+      "fit_end_ps": 5.0,
+      "n_points": 161,
+      "n_li": 4,
+      "components": {
+        "3d": {
+          "slope_A2_per_ps": 290.6136075791351,
+          "D_A2_per_ps": 48.43560126318918,
+          "D_cm2_per_s": 0.004843560126318918,
+          "r2": 0.976893561938112,
+          "linearity_ratio_late_over_early": 1.8600311144800028,
+          "regime": "super-diffusive (slope rising; no clear Fickian regime)",
+          "divisor": 6.0
+        },
+        "xy": {
+          "slope_A2_per_ps": 290.5868631487233,
+          "D_A2_per_ps": 72.64671578718082,
+          "D_cm2_per_s": 0.0072646715787180825,
+          "r2": 0.9768904349900496,
+          "linearity_ratio_late_over_early": 1.8602457270257815,
+          "regime": "super-diffusive (slope rising; no clear Fickian regime)",
+          "divisor": 4.0
+        },
+        "z": {
+          "slope_A2_per_ps": 0.026744418564527278,
+          "D_A2_per_ps": 0.013372209282263639,
+          "D_cm2_per_s": 1.337220928226364e-06,
+          "r2": 0.1745936962419532,
+          "linearity_ratio_late_over_early": 0.9521793070622117,
+          "regime": "confined plateau (no diffusion; D not physically meaningful)",
+          "divisor": 2.0
+        }
+      }
+    },
+    "model_b": {
+      "fit_start_ps": 1.0,
+      "fit_end_ps": 5.0,
+      "n_points": 161,
+      "n_li": 4,
+      "components": {
+        "3d": {
+          "slope_A2_per_ps": 286.6574682132505,
+          "D_A2_per_ps": 47.77624470220842,
+          "D_cm2_per_s": 0.004777624470220843,
+          "r2": 0.9967743242557462,
+          "linearity_ratio_late_over_early": 1.0788059431818855,
+          "regime": "approximately linear",
+          "divisor": 6.0
+        },
+        "xy": {
+          "slope_A2_per_ps": 286.6973903069934,
+          "D_A2_per_ps": 71.67434757674835,
+          "D_cm2_per_s": 0.007167434757674835,
+          "r2": 0.9967786525373491,
+          "linearity_ratio_late_over_early": 1.0782503950479614,
+          "regime": "approximately linear",
+          "divisor": 4.0
+        },
+        "z": {
+          "slope_A2_per_ps": -0.03992212594893066,
+          "D_A2_per_ps": -0.01996106297446533,
+          "D_cm2_per_s": -1.996106297446533e-06,
+          "r2": 0.2538146471914372,
+          "linearity_ratio_late_over_early": -0.4741484295077913,
+          "regime": "confined plateau (no diffusion; D not physically meaningful)",
+          "divisor": 2.0
+        }
+      }
+    }
+  }
+}

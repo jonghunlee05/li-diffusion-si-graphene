@@ -8,7 +8,8 @@ volume changes and improves electrical conductivity. The behavior of lithium at 
 Si–graphene interface — especially around graphene defects — is central to rate
 performance and cycle life.
 
-> **Status: Phases 1–5 complete; Phase 6 next.**
+> **Status: Phases 1–6 complete; Phase 7 (MSD/diffusion analysis) done — results are
+> comparative-only (no clean Fickian regime on this short run; see below).**
 > Toolchain validated (Phase 1), pristine graphene + Li structure built (Phase 2),
 > Li–Si–C ReaxFF QEq smoke test passed (Phase 3), **Model A (pristine
 > Si–graphene–Li)** (Phase 4) and **Model B (single-vacancy graphene)** (Phase 5)
@@ -38,7 +39,7 @@ This is the project's end goal. The phases below track progress toward it; Phase
 | 4 | Model A: pristine Si–graphene–Li | Build, minimize, and equilibrate the pristine Si–graphene interface with Li. | **Complete** |
 | 5 | Model B: defective Si–graphene–Li | Same as Model A plus a graphene vacancy defect; identical protocol. | **Complete** |
 | 6 | Production MD | Run diffusion simulations for Models A and B. | **Active** |
-| 7 | MSD & diffusion analysis | Compute MSD, diffusion coefficients, and pathway statistics; compare defect vs. pristine. | Planned |
+| 7 | MSD & diffusion analysis | Compute MSD, diffusion coefficients, and pathway statistics; compare defect vs. pristine. | **Done (comparative-only)** |
 
 ---
 
@@ -107,8 +108,8 @@ Details and validation:
 ## Phase 4 (complete) — Model A: pristine Si–graphene–Li
 
 Built the first real interface model — a **Si(111) slab + pristine graphene + Li**
-(48 Si + 18 C + 9 Li) — and confirmed it **minimizes and equilibrates without
-collapse** using the validated Li–Si–C ReaxFF. Si is strained −3.64% to match
+(48 Si + 18 C + 4 Li, 70 atoms) — and confirmed it **minimizes and equilibrates
+without collapse** using the validated Li–Si–C ReaxFF. Si is strained −3.64% to match
 graphene (methodology's ~4% mismatch); Si–graphene gap 2.0 Å (Chou [1]); 18 Å
 vacuum (Qin [2]). Bottom Si is fixed (the ReaxFF has no H, so Qin's H-passivation
 isn't possible — documented deviation). **Structural validation only** — no
@@ -137,8 +138,8 @@ Details and validation:
 ## Phase 5 (complete) — Model B: single-vacancy Si–graphene–Li
 
 Built the defective counterpart — **Model B = Si slab + single-vacancy graphene +
-Li** (48 Si + 17 C + 9 Li) — by importing Model A's exact builder and removing
-**one central carbon** (single vacancy; Si et al. [6] "SV defects are created by
+Li** (48 Si + 17 C + 4 Li, 69 atoms) — by importing Model A's exact builder and
+removing **one central carbon** (single vacancy; Si et al. [6] "SV defects are created by
 removing a C atom"; methodology, Qin [2]). Everything else is identical to Model
 A (box, Li, ReaxFF, QEq, protocol), verified by
 [analysis/compare_model_a_b_structures.py](analysis/compare_model_a_b_structures.py).
@@ -206,6 +207,52 @@ python analysis/plot_temperature_energy_ramp.py  # staged ramp (4 stages, one ps
 Details and validation:
 [docs/phase6_production_md.md](docs/phase6_production_md.md) ·
 [notes/phase6_production_validation.md](notes/phase6_production_validation.md).
+
+---
+
+## Phase 7 — Li MSD & diffusion analysis (Models A & B)
+
+**Analysis only — no new MD, no structure changes.** Compute the Li mean-squared
+displacement (MSD) from the Phase 6 trajectories, fit the linear regime to get
+diffusion coefficients, and compare Model B (single-vacancy) vs Model A (pristine).
+MSD is split into **3D**, **in-plane x-y**, and **z (interface-normal)** because the
+research question is whether Li **penetrate through** the sheet (z), which a large
+in-plane MSD alone would not show.
+
+> **Dataset:** uses the **4-Li** `*_ramp_1200K.lammpstrj` trajectories (consistent
+> with the current structures); the older `*_production.lammpstrj` were a superseded
+> 9-Li configuration. Scripts take trajectory paths as arguments.
+
+```bash
+source .venv/bin/activate
+python analysis/compute_li_msd.py                 # Li MSD (3D, x-y, z) -> CSVs
+python analysis/plot_msd.py                        # plot MSD FIRST (pick window from data)
+python analysis/fit_diffusion_coefficients.py --fit-start 1.0 --fit-end 5.0   # fit -> D
+python analysis/plot_msd_fits.py                   # show the chosen fit windows
+python analysis/compare_diffusion.py               # D_B / D_A
+
+# Optional: same analysis across ALL four ramp temperatures (300/600/900/1200 K)
+python analysis/msd_temperature_sweep.py --stage diagnose   # pick windows from data
+python analysis/msd_temperature_sweep.py --stage fit        # combined D-vs-T + figures
+```
+
+MSD → D via `MSD_d = 2·dim·D·τ` (3D: slope/6, x-y: slope/4, z: slope/2);
+`D[cm²/s] = D[Å²/ps] × 1e-4`. Fitting windows are documented in
+`analysis/fit_windows.json` and chosen **after** viewing the MSD (not blindly).
+
+> **Result (comparative-only — no real-battery claim):** on this short (10 ps),
+> 4-Li run the x-y/3D Li MSD is **super-diffusive** (no clean Fickian regime) and the
+> z MSD is a **confined plateau** (Li do not cross the sheet on this timescale). The
+> apparent in-plane mobility of Model B ≈ Model A (D_B/D_A ≈ 0.99). Across the full
+> 300/600/900/1200 K sweep, z stays confined at every temperature and Model B's
+> apparent in-plane mobility is *lower* than Model A at 300–900 K, converging only at
+> 1200 K. The reported D's are **apparent, comparative values under this MD protocol —
+> not physical Li diffusivities.** A longer, larger, multi-seed production is needed
+> for real D's.
+
+Details, results, and limitations:
+[docs/phase7_analysis_workflow.md](docs/phase7_analysis_workflow.md) ·
+[notes/phase7_msd_diffusion_analysis.md](notes/phase7_msd_diffusion_analysis.md).
 
 ---
 
